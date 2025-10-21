@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+
+/* Custom colors */
+:root {
+  --primary: #4f46e5;
+  --secondary: #6366f1;
+  --accent: #facc15;
+  --bg-light: #f9fafb;
+  --bg-dark: #1f2937;
+  --text-dark: #111827;
+  --text-light: #f3f4f6;
+}
+
+body {
+  background-color: var(--bg-light);
+  color: var(--text-dark);
+  font-family: 'Inter', sans-serif;
+}
+
+/* Input animations */
+input, select, textarea {
+  transition: all 0.3s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(79,70,229,0.3);
+}
+
+/* Buttons */
+.btn {
+  transition: all 0.3s ease;
+}
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+}
