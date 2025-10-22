@@ -1,62 +1,72 @@
-import { useContext, useState } from "react";
-import { AuthContext } from "../context/AuthContext";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { registerApi } from "../services/allApi";
+import { toast } from "react-toastify";
 
 export default function Register() {
-  const { register } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  // State for form inputs
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [role, setRole] = useState('employee'); // Default role is Employee
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("employee"); // default role
+  const [loading, setLoading] = useState(false);
 
-  const handleRegister = (e) => {
-    // e.preventDefault();
+  const handleRegister = async (e) => {
+    e.preventDefault();
 
-    // --- Placeholder Registration Logic ---
-    // if (!name || !email || !password || !role) {
-    //     alert("Please fill out all fields.");
-    //     return;
-    // }
+    if (!name || !email || !password || !role) {
+      toast.error("Please fill all fields");
+      return;
+    }
 
-    // console.log(`Attempting to register: ${name}, ${email}, Role: ${role}`);
-    
-    // register(role);
-    
-    // if (role === 'manager') {
-    //     navigate("/manager/dashboard");
-    // } else {
-    //     navigate("/employee/dashboard");
-    // }
-    navigate("/login")
+    setLoading(true);
+    const reqBody = { name, email, password, role };
+
+    try {
+      const result = await registerApi(reqBody);
+
+      if (result?.status === 200 || result?.status === 201) {
+        toast.success("Registration successful! Please login.");
+        setTimeout(() => navigate("/login"), 1200);
+      } else {
+        const message =
+          result?.response?.data?.message || "Registration failed. Try again.";
+        toast.error(message);
+      }
+    } catch (error) {
+      console.error("Registration Error:", error);
+      toast.error(
+        error?.response?.data?.message ||
+          "Something went wrong during registration."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    // Background uses the gradient colors for depth and contrast
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-indigo-700 via-purple-800 to-indigo-900 px-4 py-8">
-      
-      {/* Registration Card: max-w-sm and reduced padding (p-6) for a smaller footprint */}
       <div className="bg-white rounded-xl p-6 shadow-2xl w-full max-w-sm">
-        
-        {/* Logo/Title */}
+        {/* Header */}
         <div className="text-center mb-6">
           <h1 className="text-2xl font-bold text-indigo-600 flex items-center justify-center gap-1">
-            <span className="material-symbols-outlined text-3xl">
-              checklist
-            </span>
+            <span className="material-symbols-outlined text-3xl">checklist</span>
             TaskFlow
           </h1>
-          <h2 className="text-lg font-semibold text-gray-700 mt-3">Create Account</h2>
+          <h2 className="text-lg font-semibold text-gray-700 mt-3">
+            Create Account
+          </h2>
         </div>
 
-        {/* Registration Form */}
+        {/* Form */}
         <form onSubmit={handleRegister} className="space-y-4">
-          
-          {/* Name Input */}
+          {/* Name */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 text-left mb-1" htmlFor="name">
+            <label
+              htmlFor="name"
+              className="block text-sm font-medium text-gray-700 text-left mb-1"
+            >
               Full Name
             </label>
             <input
@@ -70,9 +80,12 @@ export default function Register() {
             />
           </div>
 
-          {/* Email Input */}
+          {/* Email */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 text-left mb-1" htmlFor="email">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700 text-left mb-1"
+            >
               Email Address
             </label>
             <input
@@ -86,9 +99,12 @@ export default function Register() {
             />
           </div>
 
-          {/* Password Input */}
+          {/* Password */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 text-left mb-1" htmlFor="password">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700 text-left mb-1"
+            >
               Password
             </label>
             <input
@@ -102,9 +118,12 @@ export default function Register() {
             />
           </div>
 
-          {/* Role Select */}
+          {/* Role */}
           <div className="relative">
-            <label className="block text-sm font-medium text-gray-700 text-left mb-1" htmlFor="role">
+            <label
+              htmlFor="role"
+              className="block text-sm font-medium text-gray-700 text-left mb-1"
+            >
               Select Role
             </label>
             <select
@@ -117,25 +136,27 @@ export default function Register() {
               <option value="employee">Employee</option>
               <option value="manager">Manager</option>
             </select>
-            {/* Custom arrow positioned based on the smaller card size */}
-            <span className="material-symbols-outlined absolute right-2 top-8 text-gray-400 pointer-events-none">arrow_drop_down</span>
+            <span className="material-symbols-outlined absolute right-2 top-8 text-gray-400 pointer-events-none">
+              arrow_drop_down
+            </span>
           </div>
 
-
-          {/* Register Button (Primary Indigo Theme) */}
+          {/* Submit */}
           <button
             type="submit"
-            className="w-full py-2 mt-5 bg-indigo-600 text-white font-semibold rounded-full shadow-md hover:bg-indigo-700 transition duration-300 flex items-center justify-center gap-2 text-base"
+            disabled={loading}
+            className={`w-full py-2 mt-5 bg-indigo-600 text-white font-semibold rounded-full shadow-md transition duration-300 flex items-center justify-center gap-2 text-base ${
+              loading ? "opacity-50 cursor-not-allowed" : "hover:bg-indigo-700"
+            }`}
           >
-            {/* <span className="material-icons-round text-lg">person_add</span> */}
-            Register Account
+            {loading ? "Creating Account..." : "Register Account"}
           </button>
         </form>
 
-        {/* Footer Link */}
+        {/* Footer */}
         <p className="mt-6 text-xs text-gray-600 text-center">
           Already have an account?{" "}
-          <button 
+          <button
             onClick={() => navigate("/login")}
             className="text-indigo-600 font-semibold hover:text-indigo-800 transition duration-300"
           >
